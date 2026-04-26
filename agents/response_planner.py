@@ -5,6 +5,7 @@ class ResponsePlannerAgent:
         # Mapeo de amenazas a acciones recomendadas
         self.strategy_map = {
             "SQL Injection Detected": "Block IP and Invalidate Session JWT",
+            "XSS Attempt": "Block IP",
             "Unauthorized Path Access": "Invalidate Session and Escalate to SOC",
             "Brute Force Attempt": "Add IP to Temporary Deny List",
             "Normal": "Log and Monitor"

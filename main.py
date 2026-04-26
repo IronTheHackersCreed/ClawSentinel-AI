@@ -62,8 +62,15 @@ async def ingest_logs(request: Request):
         if context["analysis"]["is_confirmed"]:
             context = agente_3.plan(context)
             
-            # PASO 5: AGENTE 4 - Ejecución de Mitigación
-            context = agente_4.execute(context)
+            # HITL (Human-in-the-Loop): Pausar ejecución si es muy crítico
+            if context["analysis"]["anomaly_score"] > 0.9:
+                context["mitigation"]["status"] = "pending_approval"
+                context["mitigation"]["action_executed"] = "Waiting for human authorization"
+                print(f"[OpenClaw] EJECUCIÓN PAUSADA: Esperando autorización del Admin.")
+            else:
+                # PASO 5: AGENTE 4 - Ejecución de Mitigación Automática
+                context = agente_4.execute(context)
+
     
     print(f"[OpenClaw] FIN DE ORQUESTACIÓN. Estatus: {context['mitigation']['status']}")
     
@@ -74,6 +81,26 @@ async def ingest_logs(request: Request):
         "action": context["mitigation"]["action_executed"],
         "full_context": context
     }
+
+@app.post("/execute")
+async def execute_mitigation(request: Request):
+    """
+    Punto de entrada para que el Admin apruebe la ejecución (Agente 4).
+    """
+    data = await request.json()
+    context = data.get("full_context", {})
+    
+    if not context:
+        return {"error": "No context provided"}
+        
+    print(f"\n[OpenClaw] AUTORIZACIÓN RECIBIDA. Ejecutando Agente 4 para: {context.get('incident_id')}")
+    context = agente_4.execute(context)
+    
+    return {
+        "message": "Mitigación Ejecutada",
+        "full_context": context
+    }
+
 
 # Servir el frontend de React si existe la carpeta compilada
 dist_path = os.path.join(os.path.dirname(__file__), "dashboard", "dist")
