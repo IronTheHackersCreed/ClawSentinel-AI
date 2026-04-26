@@ -102,18 +102,28 @@ const App = () => {
     }
   };
 
-  const approveAction = () => {
+  const approveAction = async () => {
     setIsApproving(true);
-    setTimeout(() => {
-      setIncidents(prev => [pendingIncident, ...prev].slice(0, 10));
+    try {
+      const apiUrl = import.meta.env.DEV ? 'http://localhost:8000/execute' : '/execute';
+      const response = await axios.post(apiUrl, {
+        full_context: pendingIncident
+      });
+      
+      const executedIncident = response.data.full_context;
+      
+      setIncidents(prev => [executedIncident, ...prev].slice(0, 10));
       setStats(prev => ({
         ...prev, 
         threatsBlocked: prev.threatsBlocked + 1,
         pendingActions: prev.pendingActions - 1
       }));
       setPendingIncident(null);
+    } catch (error) {
+      console.error("Error al ejecutar autorización:", error);
+    } finally {
       setIsApproving(false);
-    }, 1000);
+    }
   };
 
   return (
