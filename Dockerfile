@@ -1,5 +1,5 @@
 # Fase 1: Construir el frontend de React con Vite
-FROM node:18-alpine AS frontend-builder
+FROM node:22-alpine AS frontend-builder
 WORKDIR /app/dashboard
 COPY dashboard/package*.json ./
 RUN npm install
