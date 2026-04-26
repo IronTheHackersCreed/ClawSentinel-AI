@@ -1,0 +1,51 @@
+name: Build and Deploy to Render
+
+on:
+  push:
+    branches:
+      - main
+      - darwin # Se ejecutará al hacer push a las ramas main o darwin
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Docker Image (CI)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Fase de Integración Continua (CI): Construir la imagen para asegurar que compila correctamente
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          tags: clawsentinel-ai:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Trigger Render Deploy (CD)
+    runs-on: ubuntu-latest
+    needs: build
+    # Solo se ejecuta si es un push (no un pull request)
+    if: github.event_name == 'push'
+
+    steps:
+      # Fase de Despliegue Continuo (CD): Avisar a Render que actualice el servicio
+      - name: Trigger Render Deploy Hook
+        # Se verifica si el secreto existe antes de intentar llamar al webhook
+        if: env.RENDER_DEPLOY_HOOK_URL != ''
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          echo "Disparando despliegue en Render..."
+          curl -X POST "$RENDER_DEPLOY_HOOK_URL"
+          echo "Despliegue iniciado."
