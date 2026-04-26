@@ -35,6 +35,7 @@ const App = () => {
   });
   const [isApproving, setIsApproving] = useState(false);
   const [pendingIncident, setPendingIncident] = useState(null);
+  const [clickCount, setClickCount] = useState(0);
 
   // Conexión real con el Agente de Maritime
   useEffect(() => {
@@ -74,13 +75,23 @@ const App = () => {
   }, []);
 
   const triggerTestIncident = async () => {
-    const attacks = [
-      { path: "/login", payload: "'; DROP TABLE users; --", threat: "SQL Injection", rate: 5 },
-      { path: "/admin", payload: "<script>alert('XSS')</script>", threat: "XSS Attempt", rate: 5 },
-      { path: "/config", payload: "get_config", threat: "Unauthorized Access", rate: 5 },
-      { path: "/api/v1/auth", payload: "login_attempt", threat: "DDoS Attack", rate: 5000 }
-    ];
-    const selected = attacks[Math.floor(Math.random() * attacks.length)];
+    // Detectar si el usuario está haciendo muchos clics rápidos (Simulación DDoS)
+    setClickCount(prev => prev + 1);
+    setTimeout(() => setClickCount(prev => Math.max(0, prev - 1)), 2000);
+    
+    const isDdos = clickCount > 3; // Más de 3 clics en 2 segundos dispara el DDoS
+    
+    let selected;
+    if (isDdos) {
+      selected = { path: "/api/v1/auth", payload: "massive_login_attempt", threat: "DDoS Attack", rate: 5000 };
+    } else {
+      const attacks = [
+        { path: "/login", payload: "'; DROP TABLE users; --", threat: "SQL Injection", rate: 5 },
+        { path: "/admin", payload: "<script>alert('XSS')</script>", threat: "XSS Attempt", rate: 5 },
+        { path: "/config", payload: "get_config", threat: "Unauthorized Access", rate: 5 }
+      ];
+      selected = attacks[Math.floor(Math.random() * attacks.length)];
+    }
 
     try {
       const apiUrl = import.meta.env.DEV ? 'http://localhost:8000/ingest' : '/ingest';
