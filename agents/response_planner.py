@@ -8,6 +8,7 @@ class ResponsePlannerAgent:
             "XSS Attempt": "Block IP",
             "Unauthorized Path Access": "Invalidate Session and Escalate to SOC",
             "Brute Force Attempt": "Add IP to Temporary Deny List",
+            "DDoS Attack Detected": "Enable Cloudflare Under Attack Mode and Block IP Range",
             "Normal": "Log and Monitor"
         }
 

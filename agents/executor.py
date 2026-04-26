@@ -20,6 +20,10 @@ class ExecutorAgent:
             self._invalidate_jwt(context["metadata"]["user_id"])
             actions_taken.append("User JWT invalidated in Redis")
             
+        if "Enable Cloudflare Under Attack Mode" in plan:
+            self._enable_cloudflare_under_attack()
+            actions_taken.append("Cloudflare Under Attack Mode ENABLED")
+            
         if not actions_taken:
             actions_taken.append("No technical execution needed")
 
@@ -37,3 +41,8 @@ class ExecutorAgent:
     def _invalidate_jwt(self, user_id):
         # Simulación de invalidación de token
         print(f"[Maritime Sandbox] [Auth] INVALIDANDO JWT PARA USUARIO: {user_id}...")
+
+    def _enable_cloudflare_under_attack(self):
+        # Simulación de activación de modo defensa en Cloudflare
+        print(f"[Maritime Sandbox] [Cloudflare WAF] ACTIVANDO 'I'm Under Attack' MODE...")
+        time.sleep(0.8) # Simula latencia API externa

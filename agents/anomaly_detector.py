@@ -48,6 +48,12 @@ class AnomalyDetector:
         if "/admin" in context["metadata"]["request_path"]:
             score = max(score, 0.80)
             threat = threat if score > 0.85 else "Unauthorized Path Access"
+            
+        # 4. Detección de DDoS / Fuerza Bruta (Volumetría)
+        request_rate = context["metadata"].get("request_rate", 1)
+        if request_rate > 100:
+            score = 0.99
+            threat = "DDoS Attack Detected"
 
         context["analysis"]["anomaly_score"] = score
         context["analysis"]["threat_type"] = threat

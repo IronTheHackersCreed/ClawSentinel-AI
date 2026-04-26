@@ -75,9 +75,10 @@ const App = () => {
 
   const triggerTestIncident = async () => {
     const attacks = [
-      { path: "/login", payload: "'; DROP TABLE users; --", threat: "SQL Injection" },
-      { path: "/admin", payload: "<script>alert('XSS')</script>", threat: "XSS Attempt" },
-      { path: "/config", payload: "get_config", threat: "Unauthorized Access" }
+      { path: "/login", payload: "'; DROP TABLE users; --", threat: "SQL Injection", rate: 5 },
+      { path: "/admin", payload: "<script>alert('XSS')</script>", threat: "XSS Attempt", rate: 5 },
+      { path: "/config", payload: "get_config", threat: "Unauthorized Access", rate: 5 },
+      { path: "/api/v1/auth", payload: "login_attempt", threat: "DDoS Attack", rate: 5000 }
     ];
     const selected = attacks[Math.floor(Math.random() * attacks.length)];
 
@@ -87,7 +88,8 @@ const App = () => {
         ip: "192.168.1." + Math.floor(Math.random() * 255),
         user_id: "user_" + Math.floor(Math.random() * 1000),
         path: selected.path,
-        payload: btoa(selected.payload) // Codificamos en Base64 para evadir el WAF de Render
+        payload: btoa(selected.payload), // Codificamos en Base64 para evadir el WAF de Render
+        request_rate: selected.rate
       });
       
       if (response.data.full_context.analysis.anomaly_score > 0.9) {

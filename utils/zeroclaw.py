@@ -12,7 +12,7 @@ def log_latency(func):
         return result
     return wrapper
 
-def generate_incident_context(source_ip, user_id, path, payload):
+def generate_incident_context(source_ip, user_id, path, payload, request_rate=1):
     """Genera el esquema de datos unificado del incidente."""
     return {
         "incident_id": str(uuid.uuid4()),
@@ -21,7 +21,8 @@ def generate_incident_context(source_ip, user_id, path, payload):
             "source_ip": source_ip,
             "user_id": user_id,
             "request_path": path,
-            "payload": payload
+            "payload": payload,
+            "request_rate": request_rate
         },
         "analysis": {
             "anomaly_score": 0.0,

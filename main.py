@@ -53,7 +53,8 @@ async def ingest_logs(request: Request):
         source_ip=data.get("ip", "0.0.0.0"),
         user_id=data.get("user_id", "anonymous"),
         path=data.get("path", "/"),
-        payload=decoded_payload
+        payload=decoded_payload,
+        request_rate=data.get("request_rate", 1)
     )
     
     print(f"\n[OpenClaw] INICIO DE ORQUESTACIÓN: {context['incident_id']}")
