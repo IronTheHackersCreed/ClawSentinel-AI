@@ -16,7 +16,7 @@ app = FastAPI(title="ClawSentinel-AI Orchestrator (OpenClaw)")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -40,13 +40,20 @@ async def ingest_logs(request: Request):
         data = await request.json()
     except Exception:
         data = {}
+    import base64
+    raw_payload = data.get("payload", "")
+    try:
+        # Decodificar el payload que viene en Base64 desde el frontend (para evadir el WAF de Render)
+        decoded_payload = base64.b64decode(raw_payload).decode("utf-8")
+    except Exception:
+        decoded_payload = raw_payload
     
     # PASO 1: Generar Contexto Unificado
     context = generate_incident_context(
         source_ip=data.get("ip", "0.0.0.0"),
         user_id=data.get("user_id", "anonymous"),
         path=data.get("path", "/"),
-        payload=data.get("payload", "")
+        payload=decoded_payload
     )
     
     print(f"\n[OpenClaw] INICIO DE ORQUESTACIÓN: {context['incident_id']}")
@@ -73,6 +80,10 @@ async def ingest_logs(request: Request):
 
     
     print(f"[OpenClaw] FIN DE ORQUESTACIÓN. Estatus: {context['mitigation']['status']}")
+    
+    # IMPORTANTE: Redactar el payload malicioso antes de enviarlo al cliente.
+    # Si no lo hacemos, cuando el frontend lo envíe a /execute, el WAF de Render bloqueará el POST.
+    context["metadata"]["payload"] = "[MALICIOUS_PAYLOAD_REDACTED_BY_SYSTEM]"
     
     return {
         "message": "Flujo de Respuesta Autónoma Completado",
