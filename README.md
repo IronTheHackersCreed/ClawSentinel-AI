@@ -37,16 +37,41 @@ Desarrollo de un sistema de respuesta ante incidentes basado en agentes de IA pa
 
 ---
 
-## 🛠️ Distribución de Tareas (Equipo de 5)
+## 🚀 Cómo Ejecutar el Proyecto
 
-| Miembro | Rol | Responsabilidad Principal |
-| :--- | :--- | :--- |
-| **Compañero 1** | AI / Backend | Lógica de Agentes 1 y 2 + Implementación de **ZeroClaw**. |
-| **Compañero 2** | Backend / DevSecOps | Orquestación con **OpenClaw** + Scripts de Agente 4 (**Maritime**). |
-| **Compañero 3** | Frontend | Dashboard en React, visualización de logs y alertas en tiempo real. |
-| **Compañero 4** | Data / QA | Creación de datasets de ataques y validación de falsos positivos. |
-| **Líder (Tú)** | Arquitecto / Pitch | Integración general, lógica de negocio BCP y preparación de la presentación. |
+### Requisitos
+- Python 3.10+
+- Node.js 18+
+
+### Paso 1: Iniciar Backend
+```bash
+pip install -r requirements.txt
+python main.py
+```
+
+### Paso 2: Iniciar Frontend (Dashboard)
+```bash
+cd dashboard
+npm install
+npm run dev
+```
+
+> **Nota:** En Windows puedes usar el script `start_clawsentinel.ps1` para lanzar ambos servicios automáticamente.
 
 ---
 
-> **Nota técnica:** Se recomienda que el esquema JSON definido en la Fase 1 sea el "único punto de verdad" para asegurar que los agentes hablen el mismo idioma durante toda la orquestación.
+## 🏆 Valor Agregado para el BCP
+- **Reducción del MTTR:** De minutos de análisis manual a **menos de 1 segundo** de respuesta autónoma.
+- **Stack SundAI:** Uso de orquestación ZeroClaw/OpenClaw para latencia ultra-baja.
+- **Seguridad Maritime:** Entorno aislado para la ejecución de cambios en red.
+
+---
+
+## 🛠️ Distribución Final de Agentes
+1. **Agente 1 (Detector):** Análisis de patrones (SQLi, XSS, Path Anomalies).
+2. **Agente 2 (Root Cause):** Validación mediante reputación de IP e historial.
+3. **Agente 3 (Planner):** Generación de estrategias de mitigación dinámicas.
+4. **Agente 4 (Executor):** Ejecución en WAF y sistemas de identidad.
+
+---
+> Proyecto desarrollado para la Hackathon de Ciberseguridad BCP 2026.

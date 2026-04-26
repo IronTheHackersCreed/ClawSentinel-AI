@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: clawsentinel-ai
+    runtime: docker
+    plan: free
+    region: ohio
+    branch: main
+    # Si Render usa por defecto tu rama, cambiar a "darwin" si es necesario.
+    # branch: darwin
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: 10000
